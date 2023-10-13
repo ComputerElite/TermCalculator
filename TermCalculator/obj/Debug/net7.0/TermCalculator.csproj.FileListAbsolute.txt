@@ -1,0 +1,15 @@
+/home/computerelite/rider/TermCalculator/TermCalculator/bin/Debug/net7.0/TermCalculator
+/home/computerelite/rider/TermCalculator/TermCalculator/bin/Debug/net7.0/TermCalculator.deps.json
+/home/computerelite/rider/TermCalculator/TermCalculator/bin/Debug/net7.0/TermCalculator.runtimeconfig.json
+/home/computerelite/rider/TermCalculator/TermCalculator/bin/Debug/net7.0/TermCalculator.dll
+/home/computerelite/rider/TermCalculator/TermCalculator/bin/Debug/net7.0/TermCalculator.pdb
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.csproj.AssemblyReference.cache
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.GeneratedMSBuildEditorConfig.editorconfig
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.AssemblyInfoInputs.cache
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.AssemblyInfo.cs
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.csproj.CoreCompileInputs.cache
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.dll
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/refint/TermCalculator.dll
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.pdb
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.genruntimeconfig.cache
+/home/computerelite/rider/TermCalculator/TermCalculator/obj/Debug/net7.0/ref/TermCalculator.dll
