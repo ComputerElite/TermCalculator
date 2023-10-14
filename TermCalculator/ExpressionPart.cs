@@ -18,10 +18,13 @@ public class ExpressionPart
     public bool IsNaN => double.IsNaN(number);
     public bool IsNumber => type == ExpressionPartType.Number;
     public bool IsFunction => type == ExpressionPartType.Function;
+    public bool IsNumberOrFunction => IsFunction || IsNumber;
     public static ExpressionPart Multiply => new ExpressionPart(ExpressionPartType.Multiply);
     public static ExpressionPart ParanthesisOpen => new ExpressionPart(ExpressionPartType.ParenthesisOpen);
     public static ExpressionPart ParanthesisClose => new ExpressionPart(ExpressionPartType.ParenthesisClose);
-
+    public static ExpressionPart Add => new ExpressionPart(ExpressionPartType.Add);
+    public static ExpressionPart Subtract => new ExpressionPart(ExpressionPartType.Subtract);
+    
     public ExpressionPart(ExpressionPartType type)
     {
         this.type = type;

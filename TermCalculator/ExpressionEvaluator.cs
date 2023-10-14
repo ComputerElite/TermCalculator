@@ -118,19 +118,17 @@ public class ExpressionEvaluator
         return expression;
     }
 
-    static Expression EvaluateParentheses(Expression expression)
+    static Expression FindFirstParentheses(Expression expression, int startAt = 0)
     {
         if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
-        DisplayDebugInfo("Searching for parentheses");
-        int start = -1;
-        int end = -1;
+        expression.parenthesesSearchResult = new ParenthesesSearchResult();
         int parenthesisCounter = 0;
-        for (int i = 0; i < expression.Count; i++)
+        for (int i = startAt; i < expression.Count; i++)
         {
             if (expression[i].type == ExpressionPartType.ParenthesisOpen)
             {
                 parenthesisCounter++;
-                if (start == -1) start = i;
+                if (expression.parenthesesSearchResult.openIndex == -1) expression.parenthesesSearchResult.openIndex = i;
             }
 
             if (expression[i].type == ExpressionPartType.ParenthesisClose)
@@ -145,10 +143,10 @@ public class ExpressionEvaluator
                     expression.evaluationResultDetails.referenceIndices.Add(i);
                     return expression;
                 }
-                if (parenthesisCounter == 0 && start != -1)
+                if (parenthesisCounter == 0 && expression.parenthesesSearchResult.openIndex != -1)
                 {
                     // Matching closing parenthesis was found
-                    end = i;
+                    expression.parenthesesSearchResult.closeIndex = i;
                     break;
                 }
             }
@@ -160,25 +158,30 @@ public class ExpressionEvaluator
             expression.evaluationResult = EvaluationResult.EvaluationFail;
             expression.evaluationResultDetails.detailsEnum =
                 EvaluationResultDetailsEnum.OpeningParenthesisWithoutClosingParenthesis;
-            expression.evaluationResultDetails.referenceIndices.Add(start);
+            expression.evaluationResultDetails.referenceIndices.Add(expression.parenthesesSearchResult.openIndex);
             return expression;
         }
 
-        if (start != -1 && end != -1)
-        {
-            // Parenthesis have been found, evaluate expression inside parenthesis
-            DisplayDebugExpression(expression, "Evaluating parentheses", new List<int> { start, end }, Range(start + 1, end - 1));
+        return expression;
+    }
 
-            Expression EvaluatedParanthesis = EvaluatePartOfExpression(expression, start + 1, end - 1);
-            if (EvaluatedParanthesis.Count > 1)
-            {
-                EvaluatedParanthesis.Insert(EvaluatedParanthesis.Count, ExpressionPart.ParanthesisClose);
-                EvaluatedParanthesis.Insert(0, ExpressionPart.ParanthesisOpen);
-            }
-            
-            // Evaluate updated expression to evaluate any other parentheses at this depth
-            expression = EvaluateExpression(Replace(expression, start, end, EvaluatedParanthesis));
+    static Expression EvaluateParentheses(Expression expression)
+    {
+        if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
+        expression = FindFirstParentheses(expression);
+        if (!expression.parenthesesSearchResult.found) return expression;
+        // Parenthesis have been found, evaluate expression inside parenthesis
+        DisplayDebugExpression(expression, "Evaluating parentheses", new List<int> { expression.parenthesesSearchResult.openIndex, expression.parenthesesSearchResult.closeIndex }, Range(expression.parenthesesSearchResult.openIndex + 1, expression.parenthesesSearchResult.closeIndex - 1));
+
+        Expression EvaluatedParanthesis = EvaluatePartOfExpression(expression, expression.parenthesesSearchResult.openIndex + 1, expression.parenthesesSearchResult.closeIndex - 1);
+        if (EvaluatedParanthesis.Count > 1)
+        {
+            EvaluatedParanthesis.Insert(EvaluatedParanthesis.Count, ExpressionPart.ParanthesisClose);
+            EvaluatedParanthesis.Insert(0, ExpressionPart.ParanthesisOpen);
         }
+        
+        // Evaluate updated expression to evaluate any other parentheses at this depth
+        expression = EvaluateExpression(Replace(expression, expression.parenthesesSearchResult.openIndex, expression.parenthesesSearchResult.closeIndex, EvaluatedParanthesis));
 
         return expression;
     }
@@ -272,6 +275,11 @@ public class ExpressionEvaluator
         return range;
     }
 
+    public static void DisplayDebugExpression(Expression expression, string text)
+    {
+        DisplayDebugExpression(expression, text, new List<int>(), new List<int>());
+    }
+
     public static void DisplayDebugExpression(Expression expression, string text, List<int> operatorIndices, List<int> operandIndices)
     {
         if (!showDebugInfo) return;
@@ -322,5 +330,57 @@ public class ExpressionEvaluator
         }
 
         return clone;
+    }
+
+    /// <summary>
+    /// Multiplies out an expression. Must contain 2 pairs of parentheses
+    /// Expected expression input examples:
+    /// (2+2)*(1-7)
+    /// (2+6+8)*(9+1-9)
+    /// </summary>
+    /// <param name="expression"></param>
+    public static Expression MultiplyOut(Expression expression)
+    {
+        // First split into left parentheses and right parentheses
+        Expression firstPart = FindFirstParentheses(expression);
+        Console.WriteLine(firstPart.parenthesesSearchResult.openIndex + "   " + firstPart.parenthesesSearchResult.closeIndex);
+        firstPart = GetExpressionParts(expression, firstPart.parenthesesSearchResult.openIndex + 1,
+            firstPart.parenthesesSearchResult.closeIndex - 1);
+        
+        Expression secondPart = FindFirstParentheses(expression, firstPart.parenthesesSearchResult.closeIndex + 1);
+        secondPart = GetExpressionParts(expression, secondPart.parenthesesSearchResult.openIndex + 1,
+            secondPart.parenthesesSearchResult.closeIndex - 1);
+        
+        DisplayDebugExpression(firstPart, "First");
+        DisplayDebugExpression(secondPart, "Second");
+        Expression done = new Expression();
+        for (int i = 0; i < firstPart.Count; i++)
+        {
+            if(!firstPart[i].IsNumberOrFunction) i++;
+            ExpressionPart iOperator = i == 0 ? ExpressionPart.Add : firstPart[i - 1];
+            ExpressionPart iOperand = firstPart[i];
+            for (int j = 0; j < secondPart.Count; j++)
+            {
+                if(!secondPart[j].IsNumberOrFunction) j++;
+                ExpressionPart jOperator = j == 0 ? ExpressionPart.Add : secondPart[j - 1];
+                ExpressionPart jOperand = secondPart[j];
+                done.InsertEnd(GetCorrectOperandForAdditionOrSubtraction(iOperator, jOperator));
+                done.InsertEnd(iOperand);
+                done.InsertEnd(ExpressionPart.Multiply);
+                done.InsertEnd(jOperand);
+            }
+        }
+
+        return done;
+    }
+
+    static ExpressionPart GetCorrectOperandForAdditionOrSubtraction(ExpressionPart operationA,
+        ExpressionPart operationB)
+    {
+        if(operationA.type == ExpressionPartType.Add && operationB.type == ExpressionPartType.Add) return ExpressionPart.Add;
+        if(operationA.type == ExpressionPartType.Add && operationB.type == ExpressionPartType.Subtract) return ExpressionPart.Subtract;
+        if(operationA.type == ExpressionPartType.Subtract && operationB.type == ExpressionPartType.Add) return ExpressionPart.Subtract;
+        if(operationA.type == ExpressionPartType.Subtract && operationB.type == ExpressionPartType.Subtract) return ExpressionPart.Add;
+        return ExpressionPart.Add;
     }
 }

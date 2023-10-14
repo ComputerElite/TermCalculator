@@ -8,6 +8,7 @@ public class Expression
     public EvaluationResultDetails evaluationResultDetails = new EvaluationResultDetails();
 
     public int decrementI = 0;
+    public ParenthesesSearchResult parenthesesSearchResult = new ParenthesesSearchResult();
     
     public static Expression NaN => new Expression(double.NaN);
     
@@ -70,6 +71,7 @@ public class Expression
         n.evaluationResultDetails = this.evaluationResultDetails;
         n.functions = this.functions;
         n.decrementI = this.decrementI;
+        n.parenthesesSearchResult = this.parenthesesSearchResult;
         return n;
     }
 
@@ -98,6 +100,15 @@ public class Expression
     public void Insert(int index, ExpressionPart item)
     {
         parts.Insert(index, item);
+    }
+    
+    /// <summary>
+    /// Inserts an expression part at the end of an expression
+    /// </summary>
+    /// <param name="item">item to insert</param>
+    public void InsertEnd(ExpressionPart item)
+    {
+        parts.Insert(this.Count, item);
     }
 
     public void DisplayExpression(string text = "Expression contents")
@@ -161,5 +172,11 @@ public class Expression
         }
 
         return s;
+    }
+
+    public Expression SetEvaluating()
+    {
+        evaluationResult = EvaluationResult.Evaluating;
+        return this;
     }
 }
