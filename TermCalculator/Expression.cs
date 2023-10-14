@@ -106,9 +106,22 @@ public class Expression
     /// Inserts an expression part at the end of an expression
     /// </summary>
     /// <param name="item">item to insert</param>
-    public void InsertEnd(ExpressionPart item)
+    public void Append(ExpressionPart item)
     {
         parts.Insert(this.Count, item);
+    }
+    
+    public bool Any(Func<ExpressionPart, bool> predicate)
+    {
+        return parts.Any(predicate);
+    }
+    
+    public void Append(Expression expression)
+    {
+        for (int i = 0; i < expression.Count; i++)
+        {
+            Append(expression[i]);
+        }
     }
 
     public void DisplayExpression(string text = "Expression contents")
@@ -178,5 +191,21 @@ public class Expression
     {
         evaluationResult = EvaluationResult.Evaluating;
         return this;
+    }
+
+    public void PrintHumanReadable()
+    {
+        Console.WriteLine(HumanReadable());
+    }
+
+    public string HumanReadable()
+    {
+        string s = "";
+        for (int i = 0; i < this.Count; i++)
+        {
+            s += this[i].HumanReadable();
+        }
+
+        return s;
     }
 }

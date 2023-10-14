@@ -335,6 +335,7 @@ public class ExpressionEvaluator
     /// <summary>
     /// Multiplies out an expression. Must contain 2 pairs of parentheses
     /// Expected expression input examples:
+    /// (4+2)*(x)
     /// (2+2)*(1-7)
     /// (2+6+8)*(9+1-9)
     /// </summary>
@@ -343,7 +344,6 @@ public class ExpressionEvaluator
     {
         // First split into left parentheses and right parentheses
         Expression firstPart = FindFirstParentheses(expression);
-        Console.WriteLine(firstPart.parenthesesSearchResult.openIndex + "   " + firstPart.parenthesesSearchResult.closeIndex);
         firstPart = GetExpressionParts(expression, firstPart.parenthesesSearchResult.openIndex + 1,
             firstPart.parenthesesSearchResult.closeIndex - 1);
         
@@ -351,29 +351,64 @@ public class ExpressionEvaluator
         secondPart = GetExpressionParts(expression, secondPart.parenthesesSearchResult.openIndex + 1,
             secondPart.parenthesesSearchResult.closeIndex - 1);
         
-        DisplayDebugExpression(firstPart, "First");
-        DisplayDebugExpression(secondPart, "Second");
         Expression done = new Expression();
         for (int i = 0; i < firstPart.Count; i++)
         {
             if(!firstPart[i].IsNumberOrFunction) i++;
             ExpressionPart iOperator = i == 0 ? ExpressionPart.Add : firstPart[i - 1];
-            ExpressionPart iOperand = firstPart[i];
+            Expression iOperands = new Expression();
+            while (i < firstPart.Count)
+            {
+                if (firstPart[i].IsAddOrSubtract)
+                {
+                    i--;
+                    break;
+                }
+                iOperands.Append(firstPart[i]);
+                i++;
+            }
+
+            iOperands = PrepareOperandsForMultiplication(iOperands);
             for (int j = 0; j < secondPart.Count; j++)
             {
                 if(!secondPart[j].IsNumberOrFunction) j++;
                 ExpressionPart jOperator = j == 0 ? ExpressionPart.Add : secondPart[j - 1];
-                ExpressionPart jOperand = secondPart[j];
-                done.InsertEnd(GetCorrectOperandForAdditionOrSubtraction(iOperator, jOperator));
-                done.InsertEnd(iOperand);
-                done.InsertEnd(ExpressionPart.Multiply);
-                done.InsertEnd(jOperand);
+                Expression jOperands = new Expression();
+                while (j < secondPart.Count)
+                {
+                    if (secondPart[j].IsAddOrSubtract)
+                    {
+                        j--;
+                        break;
+                    }
+                    jOperands.Append(secondPart[j]);
+                    j++;
+                }
+
+                jOperands = PrepareOperandsForMultiplication(jOperands);
+                done.Append(GetCorrectOperandForAdditionOrSubtraction(iOperator, jOperator));
+                done.Append(iOperands);
+                done.Append(ExpressionPart.Multiply);
+                done.Append(jOperands);
             }
         }
 
         return done;
     }
 
+    static Expression PrepareOperandsForMultiplication(Expression operands)
+    {
+        if(operands.Count == 1) return operands;
+        if(operands.Any(x => x.type == ExpressionPartType.Divide))
+        {
+            // There is a division in the operands, so we must add parentheses
+            operands.Insert(0, ExpressionPart.ParanthesisOpen);
+            operands.Append(ExpressionPart.ParanthesisClose);
+        }
+
+        return operands;
+    }
+    
     static ExpressionPart GetCorrectOperandForAdditionOrSubtraction(ExpressionPart operationA,
         ExpressionPart operationB)
     {

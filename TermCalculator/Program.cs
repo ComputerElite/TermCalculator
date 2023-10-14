@@ -8,4 +8,14 @@ e.EvaluateExpression().DisplayExpression("Final Content");
 //e.DisplayExpression("Parsed expression");
 */
 
-ExpressionEvaluator.MultiplyOut(Parser.ParseExpression("(2-6)*(x)").SetEvaluating()).EvaluateExpression().DisplayExpression();
+Expression e = Parser.ParseExpression("(1/x-6)*(8+7-8*x)").SetEvaluating();
+e.SetConstant("x", 2);
+Console.WriteLine("Input");
+e.PrintHumanReadable();
+Console.WriteLine("\nOutput");
+Expression o = ExpressionEvaluator.MultiplyOut(e);
+o.SetConstant("x", 2);
+Expression oe = o.EvaluateExpression();
+Expression ee = e.EvaluateExpression();
+oe.DisplayExpression();
+ee.DisplayExpression();

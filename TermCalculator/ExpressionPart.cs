@@ -18,6 +18,10 @@ public class ExpressionPart
     public bool IsNaN => double.IsNaN(number);
     public bool IsNumber => type == ExpressionPartType.Number;
     public bool IsFunction => type == ExpressionPartType.Function;
+    public bool IsAdd => type == ExpressionPartType.Add;
+    public bool IsSubtract => type == ExpressionPartType.Subtract;
+    public bool IsMultiply => type == ExpressionPartType.Multiply;
+    public bool IsAddOrSubtract => IsAdd || IsSubtract;
     public bool IsNumberOrFunction => IsFunction || IsNumber;
     public static ExpressionPart Multiply => new ExpressionPart(ExpressionPartType.Multiply);
     public static ExpressionPart ParanthesisOpen => new ExpressionPart(ExpressionPartType.ParenthesisOpen);
@@ -68,5 +72,37 @@ public class ExpressionPart
     public override string ToString()
     {
         return GetTypeNamePadded() + GetExtra();
+    }
+
+    public string HumanReadable()
+    {
+        switch (type)
+        {
+            case ExpressionPartType.Add:
+                return "+";
+            case ExpressionPartType.Subtract:
+                return "-";
+            case ExpressionPartType.Multiply:
+                return "*";
+            case ExpressionPartType.Divide:
+                return "/";
+            case ExpressionPartType.ParenthesisOpen:
+                return "(";
+            case ExpressionPartType.ParenthesisClose:
+                return ")";
+            case ExpressionPartType.Equal:
+                return "=";
+            case ExpressionPartType.Exponentiation:
+                return "^";
+            case ExpressionPartType.Function:
+                return function;
+            case ExpressionPartType.Number:
+                return number.ToString();
+            case ExpressionPartType.Separator:
+                return ",";
+            case ExpressionPartType.Variable:
+                return function;
+        }
+        return "";
     }
 }
