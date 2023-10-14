@@ -26,15 +26,43 @@ public class ExpressionEvaluator
         expression = EvaluateFunctions(expression, 10000);
         
         expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Exponentiation});
+
+        expression = AddMultiplyOperationBetweenAdjacentNumbersAndFunctions(expression);
         
         expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Multiply, ExpressionPartType.Divide});
         
         expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Add, ExpressionPartType.Subtract});
 
         if (expression.depth == 0) expression.evaluationResult = EvaluationResult.EvaluatedSuccessfully;
+        DisplayDebugExpression(expression, "Evaluated at depth " + expression.depth, new List<int>(), new List<int>());
         return expression;
     }
 
+    static Expression AddMultiplyOperationBetweenAdjacentNumbersAndFunctions(Expression expression)
+    {
+        for (int i = 0; i < expression.Count - 1; i++)
+        {
+            ExpressionPartType t = expression[i].type;
+            ExpressionPartType nt = expression[i + 1].type;
+            if ((t == ExpressionPartType.Number || t == ExpressionPartType.Function) &&
+                (nt == ExpressionPartType.Number || nt == ExpressionPartType.Function))
+            {
+                // Adjacent functions/numbers have been found. A multiply operation must be added so it can be evaluated
+                expression.Insert(i+1, ExpressionPart.Multiply);
+                i++;
+            }
+        }
+
+        return expression;
+    }
+    
+    
+    /// <summary>
+    /// Evaluates all operations of specified type left to right
+    /// </summary>
+    /// <param name="expression">Expression to process</param>
+    /// <param name="typesToEvaluate">ExpressionPartTypes to evaluate</param>
+    /// <returns></returns>
     static Expression EvaluateOperations(Expression expression, List<ExpressionPartType> typesToEvaluate)
     {
         // Use decrementI variable
@@ -44,7 +72,6 @@ public class ExpressionEvaluator
             {
                 expression = EvaluateOperation(expression, i);
                 i -= expression.decrementI;
-                Console.WriteLine(i);
             }
         }
 
@@ -129,10 +156,16 @@ public class ExpressionEvaluator
         {
             // Parenthesis have been found, evaluate expression inside parenthesis
             DisplayDebugExpression(expression, "Evaluating parentheses", new List<int> { start, end }, Range(start + 1, end - 1));
+
+            Expression EvaluatedParanthesis = EvaluatePartOfExpression(expression, start + 1, end - 1);
+            if (EvaluatedParanthesis.Count > 1)
+            {
+                EvaluatedParanthesis.Insert(EvaluatedParanthesis.Count, ExpressionPart.ParanthesisClose);
+                EvaluatedParanthesis.Insert(0, ExpressionPart.ParanthesisOpen);
+            }
             
             // Evaluate updated expression to evaluate any other parentheses at this depth
-            expression = EvaluateExpression(Replace(expression, start, end,
-                EvaluatePartOfExpression(expression, start + 1, end - 1)));
+            expression = EvaluateExpression(Replace(expression, start, end, EvaluatedParanthesis));
         }
 
         return expression;
@@ -156,7 +189,7 @@ public class ExpressionEvaluator
             expression.evaluationResultDetails.referenceIndices.Add(occurrenceIndex);
             return expression;
         }
-        ExpressionPart prevNumber = occurrenceIndex == 0 ? new ExpressionPart(0) : expression[occurrenceIndex - 1];
+        ExpressionPart prevNumber = occurrenceIndex == 0 ? ExpressionPart.Number(0) : expression[occurrenceIndex - 1];
         ExpressionPart nextNumber = expression[occurrenceIndex + 1];
         ExpressionPartType operation = expression[occurrenceIndex].type;
         Expression result;
@@ -212,7 +245,7 @@ public class ExpressionEvaluator
             return expression.DecrementI(0);
         }
 
-        return Replace(expression, occurrenceIndex == 0 ? 0 : occurrenceIndex - 1, occurrenceIndex + 1, result).DecrementI(occurrenceIndex == 0 ? 1 : 2);
+        return Replace(expression, occurrenceIndex == 0 ? 0 : occurrenceIndex - 1, occurrenceIndex + 1, result).DecrementI(occurrenceIndex == 0 ? 0 : 1);
     }
 
     public static List<int> Range(int startIndex, int endIndex)

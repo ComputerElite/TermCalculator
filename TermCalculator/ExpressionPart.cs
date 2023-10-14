@@ -18,11 +18,20 @@ public class ExpressionPart
     public bool IsNaN => double.IsNaN(number);
     public bool IsNumber => type == ExpressionPartType.Number;
     public bool IsFunction => type == ExpressionPartType.Function;
-    
-    public ExpressionPart(double number)
+    public static ExpressionPart Multiply => new ExpressionPart(ExpressionPartType.Multiply);
+    public static ExpressionPart ParanthesisOpen => new ExpressionPart(ExpressionPartType.ParenthesisOpen);
+    public static ExpressionPart ParanthesisClose => new ExpressionPart(ExpressionPartType.ParenthesisClose);
+
+    public ExpressionPart(ExpressionPartType type)
     {
-        type = ExpressionPartType.Number;
-        this.number = number;
+        this.type = type;
+    }
+
+    public static ExpressionPart Number(double value)
+    {
+        ExpressionPart part = new ExpressionPart(ExpressionPartType.Number);
+        part.number = value;
+        return part;
     }
     
     public ExpressionPart() {}

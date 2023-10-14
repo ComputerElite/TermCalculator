@@ -31,7 +31,7 @@ public class Expression
     /// </summary>
     /// <param name="name">Name of the constant</param>
     /// <param name="value">Value of the constant</param>
-    public void SetContant(string name, double value)
+    public void SetConstant(string name, double value)
     {
         functions.AddConstantToFunctions(name, value);
     }
@@ -43,7 +43,7 @@ public class Expression
     /// <param name="number">content of the expression</param>
     public Expression(double number)
     {
-        parts.Add(new ExpressionPart(number));
+        parts.Add(ExpressionPart.Number(number));
     }
     
     public Expression() {}
