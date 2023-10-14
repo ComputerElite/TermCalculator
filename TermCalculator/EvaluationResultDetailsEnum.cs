@@ -5,5 +5,7 @@ public enum EvaluationResultDetailsEnum
     None,
     ClosingParenthesisWithoutOpeningParenthesis,
     OpeningParenthesisWithoutClosingParenthesis,
-    TooLittleArgumentsProvidedForFunction
+    TooLittleArgumentsProvidedForFunction,
+    OperatorAtEndOfExpression,
+    OperationNeedsNumber
 }

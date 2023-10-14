@@ -24,8 +24,30 @@ public class ExpressionEvaluator
         expression = EvaluateFunctions(expression, 0);
         // Evaluates all functions
         expression = EvaluateFunctions(expression, 10000);
+        
+        expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Exponentiation});
+        
+        expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Multiply, ExpressionPartType.Divide});
+        
+        expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Add, ExpressionPartType.Subtract});
 
         if (expression.depth == 0) expression.evaluationResult = EvaluationResult.EvaluatedSuccessfully;
+        return expression;
+    }
+
+    static Expression EvaluateOperations(Expression expression, List<ExpressionPartType> typesToEvaluate)
+    {
+        // Use decrementI variable
+        for (int i = 0; i < expression.Count; i++)
+        {
+            if (typesToEvaluate.Contains(expression[i].type))
+            {
+                expression = EvaluateOperation(expression, i);
+                i -= expression.decrementI;
+                Console.WriteLine(i);
+            }
+        }
+
         return expression;
     }
 
@@ -114,6 +136,76 @@ public class ExpressionEvaluator
         }
 
         return expression;
+    }
+
+    public static Expression EvaluateOperation(Expression expression, int occurrenceIndex)
+    {
+        if (expression.Count == occurrenceIndex + 1)
+        {
+            // There's an Operator at the end of en expression which is not supported
+            expression.evaluationResult = EvaluationResult.EvaluationFail;
+            expression.evaluationResultDetails.detailsEnum =
+                EvaluationResultDetailsEnum.OperatorAtEndOfExpression;
+            expression.evaluationResultDetails.referenceIndices.Add(occurrenceIndex);
+            return expression;
+        }
+        ExpressionPart prevNumber = occurrenceIndex == 0 ? new ExpressionPart(0) : expression[occurrenceIndex - 1];
+        ExpressionPart nextNumber = expression[occurrenceIndex + 1];
+        ExpressionPartType operation = expression[occurrenceIndex].type;
+        Expression result;
+        // ToDo:
+        // - Check if prevNumber and nextNumber are variables and if so return expression as is
+        if (!prevNumber.IsNumber)
+        {
+            // The operation is tried to be evaluated without a valid number
+            expression.evaluationResult = EvaluationResult.EvaluationFail;
+            expression.evaluationResultDetails.detailsEnum =
+                EvaluationResultDetailsEnum.OperationNeedsNumber;
+            expression.evaluationResultDetails.extraInfostring = "Operation " + operation + " needs a number before it. It may be possible that evaluation of some part of the expression failed.";
+            expression.evaluationResultDetails.referenceIndices.Add(occurrenceIndex - 1);
+            return expression;
+        }
+        if (!nextNumber.IsNumber)
+        {
+            // The operation is tried to be evaluated without a valid number
+            expression.evaluationResult = EvaluationResult.EvaluationFail;
+            expression.evaluationResultDetails.detailsEnum =
+                EvaluationResultDetailsEnum.OperationNeedsNumber;
+            expression.evaluationResultDetails.extraInfostring = "Operation " + operation + " needs a number after it. It may be possible that evaluation of some part of the expression failed.";
+            expression.evaluationResultDetails.referenceIndices.Add(occurrenceIndex + 1);
+            return expression;
+        }
+        if (prevNumber.IsNaN || nextNumber.IsNaN)
+            result = Expression.NaN;
+        else if (operation == ExpressionPartType.Add)
+            result = new Expression(prevNumber.number + nextNumber.number);
+        else if (operation == ExpressionPartType.Subtract)
+            result = new Expression(prevNumber.number - nextNumber.number);
+        else if (operation == ExpressionPartType.Multiply)
+            result = new Expression(prevNumber.number * nextNumber.number);
+        else if (operation == ExpressionPartType.Divide)
+        {
+            if (nextNumber.number == 0)
+                result = Expression.NaN;
+            else
+                result = new Expression(prevNumber.number / nextNumber.number);
+        } else if (operation == ExpressionPartType.Exponentiation)
+        {
+            if (nextNumber.number < 0 && prevNumber.number == 0)
+            {
+                // Division by 0 will occur: 0^(-1) = 1/(0^1) = NaN
+                result = Expression.NaN;
+            }
+            else
+                result = new Expression(Math.Pow(prevNumber.number, nextNumber.number));
+        }
+        else
+        {
+            // Unknown operation, return expression as is
+            return expression.DecrementI(0);
+        }
+
+        return Replace(expression, occurrenceIndex == 0 ? 0 : occurrenceIndex - 1, occurrenceIndex + 1, result).DecrementI(occurrenceIndex == 0 ? 1 : 2);
     }
 
     public static List<int> Range(int startIndex, int endIndex)

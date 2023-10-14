@@ -14,6 +14,18 @@ public class ExpressionPart
     /// If type is function or variable, the name of the function/variable
     /// </summary>
     public string function { get; set; } = "";
+    
+    public bool IsNaN => double.IsNaN(number);
+    public bool IsNumber => type == ExpressionPartType.Number;
+    
+    public ExpressionPart(double number)
+    {
+        type = ExpressionPartType.Number;
+        this.number = number;
+    }
+    
+    public ExpressionPart() {}
+        
 
     /// <summary>
     /// Creates a copy of this ExpressionPart

@@ -7,11 +7,25 @@ public class Expression
     public EvaluationResult evaluationResult = EvaluationResult.NotEvaluated;
     public EvaluationResultDetails evaluationResultDetails = new EvaluationResultDetails();
 
+    public int decrementI = 0;
+    
+    public static Expression NaN => new Expression(double.NaN);
+    
     /// <summary>
     /// Functions stores variable values and functions which can be executed by the evaluator
     /// </summary>
     public Functions functions = new Functions();
 
+    /// <summary>
+    /// Tells the calling function to decrement it's counter by the specified amount
+    /// </summary>
+    /// <returns></returns>
+    public Expression DecrementI(int amount)
+    {
+        decrementI = amount;
+        return this;
+    }
+    
     /// <summary>
     /// Creates an Expression with the number as only part
     /// For use in ExpressionEvaluator.Replace or similar
@@ -19,11 +33,7 @@ public class Expression
     /// <param name="number">content of the expression</param>
     public Expression(double number)
     {
-        parts.Add(new ExpressionPart
-        {
-            type = ExpressionPartType.Number,
-            number = number
-        });
+        parts.Add(new ExpressionPart(number));
     }
     
     public Expression() {}
@@ -49,6 +59,7 @@ public class Expression
         n.evaluationResult = this.evaluationResult;
         n.evaluationResultDetails = this.evaluationResultDetails;
         n.functions = this.functions;
+        n.decrementI = this.decrementI;
         return n;
     }
 
