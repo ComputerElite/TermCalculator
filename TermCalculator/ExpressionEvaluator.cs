@@ -55,7 +55,7 @@ public class ExpressionEvaluator
     {
         for (int i = 0; i < expression.Count; i++)
         {
-            if (expression[i].type != ExpressionPartType.SEPARATOR) continue;
+            if (expression[i].type != ExpressionPartType.Separator) continue;
             expression.RemoveAt(i);
             i--;
         }
@@ -67,7 +67,7 @@ public class ExpressionEvaluator
     {
         for (int i = 0; i < expression.Count; i++)
         {
-            if (expression[i].type != ExpressionPartType.FUNCTION) continue;
+            if (expression[i].type != ExpressionPartType.Function) continue;
             string functionName = expression[i].function;
             if (!expression.functions.ContainsFunction(functionName, maxArgumentCount)) continue;
             
@@ -138,7 +138,14 @@ public class ExpressionEvaluator
         return expression;
     }
 
-    public static Expression EvaluateOperation(Expression expression, int occurrenceIndex)
+    /// <summary>
+    /// Evaluates an operation (add, subtract, multiply, divide, exponentiation) on 2 numbers
+    /// Does not evaluate if a function is either right or left of the operator
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <param name="occurrenceIndex"></param>
+    /// <returns></returns>
+    static Expression EvaluateOperation(Expression expression, int occurrenceIndex)
     {
         if (expression.Count == occurrenceIndex + 1)
         {

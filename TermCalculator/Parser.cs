@@ -49,7 +49,7 @@ public class Parser
         if (p.type == ExpressionPartType.Number)
         {
             p.number = double.Parse(partString);
-        } else if (p.type == ExpressionPartType.FUNCTION)
+        } else if (p.type == ExpressionPartType.Function)
         {
             p.function = partString;
         }
@@ -71,8 +71,8 @@ public class Parser
         if (part == "(") return ExpressionPartType.ParenthesisOpen;
         if (part == ")") return ExpressionPartType.ParenthesisClose;
         if (part == "^") return ExpressionPartType.Exponentiation;
-        if (Regex.IsMatch(part.ToString(), @"^[A-Za-z]+$")) return ExpressionPartType.FUNCTION;
-        if (part == "=") return ExpressionPartType.EQUAL;
+        if (Regex.IsMatch(part.ToString(), @"^[A-Za-z]+$")) return ExpressionPartType.Function;
+        if (part == "=") return ExpressionPartType.Equal;
         return ExpressionPartType.Invalid;
     }
 }

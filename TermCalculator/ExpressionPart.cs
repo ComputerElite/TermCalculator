@@ -17,6 +17,7 @@ public class ExpressionPart
     
     public bool IsNaN => double.IsNaN(number);
     public bool IsNumber => type == ExpressionPartType.Number;
+    public bool IsFunction => type == ExpressionPartType.Function;
     
     public ExpressionPart(double number)
     {
@@ -48,7 +49,7 @@ public class ExpressionPart
     public string GetExtra()
     {
         if (type == ExpressionPartType.Number) return number.ToString();
-        if (type == ExpressionPartType.FUNCTION || type == ExpressionPartType.VARIABLE) return function;
+        if (type == ExpressionPartType.Function || type == ExpressionPartType.Variable) return function;
         return "";
     }
 

@@ -22,9 +22,21 @@ public class Functions
         },
         {
             "e",
-            new Function(0, "pi", E)
+            new Function(0, "e", E)
+        },
+        {
+            "add",
+            new Function(2, "add", Add)
         },
     };
+
+    public void AddConstantToFunctions(string name, double value)
+    {
+        functions.Add(name, new Function(0, name, (expression, functionOccurrenceIndex, self) =>
+        {
+            return ReplaceExpressionAndArgumentsWithNumberResult(expression, functionOccurrenceIndex, self, value);
+        }));
+    }
     
     static Expression E(Expression expression, int functionOccurrenceIndex, Function self)
     {
@@ -39,6 +51,12 @@ public class Functions
     static Expression Sin(Expression expression, int functionOccurrenceIndex, Function self)
     {
         double res = Math.Sin(GetArgument(expression, functionOccurrenceIndex, 0));
+        return ReplaceExpressionAndArgumentsWithNumberResult(expression, functionOccurrenceIndex, self, res);
+    }
+    
+    static Expression Add(Expression expression, int functionOccurrenceIndex, Function self)
+    {
+        double res = GetArgument(expression, functionOccurrenceIndex, 0) + GetArgument(expression, functionOccurrenceIndex, 1);
         return ReplaceExpressionAndArgumentsWithNumberResult(expression, functionOccurrenceIndex, self, res);
     }
     

@@ -25,6 +25,16 @@ public class Expression
         decrementI = amount;
         return this;
     }
+
+    /// <summary>
+    /// Sets up the expression so the evaluator will replace name with the value
+    /// </summary>
+    /// <param name="name">Name of the constant</param>
+    /// <param name="value">Value of the constant</param>
+    public void SetContant(string name, double value)
+    {
+        functions.AddConstantToFunctions(name, value);
+    }
     
     /// <summary>
     /// Creates an Expression with the number as only part

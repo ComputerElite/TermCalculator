@@ -41,18 +41,18 @@ public enum ExpressionPartType
     /// <summary>
     /// Anything that involves letters or words. Matches [A-Za-z]
     /// </summary>
-    FUNCTION = 8,
+    Function = 8,
     /// <summary>
     /// Equal sign
     /// </summary>
-    EQUAL = 9,
+    Equal = 9,
     /// <summary>
     /// Variable, functions will change to variable when evaluating expressions. After parsing they'll stay function
     /// </summary>
-    VARIABLE = 10,
+    Variable = 10,
     /// <summary>
     /// Separator for function arguments
     /// ','
     /// </summary>
-    SEPARATOR = 11
+    Separator = 11
 }
