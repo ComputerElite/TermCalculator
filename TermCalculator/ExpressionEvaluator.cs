@@ -13,6 +13,12 @@ public class ExpressionEvaluator
     /// <returns>evaluated expression</returns>
     public static Expression EvaluateExpression(Expression expression)
     {
+        if (expression.evaluationResult != EvaluationResult.Evaluating)
+        {
+            if (expression.evaluationResult != EvaluationResult.NotEvaluated)
+                return expression;
+            expression.evaluationResult = EvaluationResult.Evaluating;
+        }
         DisplayDebugExpression(expression, "Evaluating depth " + expression.depth, new List<int>(), new List<int>());
         
         expression = EvaluateParentheses(expression);
@@ -40,6 +46,8 @@ public class ExpressionEvaluator
 
     static Expression AddMultiplyOperationBetweenAdjacentNumbersAndFunctions(Expression expression)
     {
+        
+        if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         for (int i = 0; i < expression.Count - 1; i++)
         {
             ExpressionPartType t = expression[i].type;
@@ -65,6 +73,8 @@ public class ExpressionEvaluator
     /// <returns></returns>
     static Expression EvaluateOperations(Expression expression, List<ExpressionPartType> typesToEvaluate)
     {
+        
+        if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         // Use decrementI variable
         for (int i = 0; i < expression.Count; i++)
         {
@@ -92,6 +102,7 @@ public class ExpressionEvaluator
 
     static Expression EvaluateFunctions(Expression expression, int maxArgumentCount)
     {
+        if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         for (int i = 0; i < expression.Count; i++)
         {
             if (expression[i].type != ExpressionPartType.Function) continue;
@@ -109,6 +120,7 @@ public class ExpressionEvaluator
 
     static Expression EvaluateParentheses(Expression expression)
     {
+        if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         DisplayDebugInfo("Searching for parentheses");
         int start = -1;
         int end = -1;
@@ -180,6 +192,7 @@ public class ExpressionEvaluator
     /// <returns></returns>
     static Expression EvaluateOperation(Expression expression, int occurrenceIndex)
     {
+        if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         if (expression.Count == occurrenceIndex + 1)
         {
             // There's an Operator at the end of en expression which is not supported
@@ -291,7 +304,7 @@ public class ExpressionEvaluator
             expression.RemoveAt(startIndex);
         }
 
-        for (int i = 0; i < toInsert.Count; i++)
+        for (int i = toInsert.Count - 1; i >= 0; i--)
         {
             expression.Insert(startIndex, toInsert[i]);
         }
