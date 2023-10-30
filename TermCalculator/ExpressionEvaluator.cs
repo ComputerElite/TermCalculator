@@ -5,6 +5,7 @@ namespace TermCalculator;
 public class ExpressionEvaluator
 {
     public static bool showDebugInfo = true;
+    public static int maxDepth = 1000;
     
     /// <summary>
     /// Evaluates a given expression
@@ -18,6 +19,12 @@ public class ExpressionEvaluator
             if (expression.evaluationResult != EvaluationResult.NotEvaluated)
                 return expression;
             expression.evaluationResult = EvaluationResult.Evaluating;
+        }
+        if(expression.depth > maxDepth) {
+            expression.evaluationResult = EvaluationResult.EvaluationFail;
+            expression.evaluationResultDetails.detailsEnum = EvaluationResultDetailsEnum.MaximumDepthReached;
+            expression.evaluationResultDetails.extraInfostring = "Maximum depth of " + maxDepth + " reached. Evaluation stopped.";
+            return expression;
         }
         DisplayDebugExpression(expression, "Evaluating depth " + expression.depth, new List<int>(), new List<int>());
         

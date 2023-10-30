@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "0O9e3bN6lwwFv4fJfpajlThPU3auakzHdPACjOz9ZI7Lhi118ODlO3n4Cx87tCH6dxSH7jZFhNevtmyqdxIFLg==",
+  "dgSpecHash": "GE+QNrbs9mRLSvxs5+JV1gmZBVt2He6T+E+aKZYKU8xpypLzscVeSILRaVBU8B3su8fgnixXT1QX/vXYsUa/gg==",
   "success": true,
-  "projectFilePath": "/home/computerelite/rider/TermCalculator/TermCalculator/TermCalculator.csproj",
+  "projectFilePath": "/workspaces/TermCalculator/TermCalculator/TermCalculator.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

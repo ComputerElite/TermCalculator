@@ -7,5 +7,6 @@ public enum EvaluationResultDetailsEnum
     OpeningParenthesisWithoutClosingParenthesis,
     TooLittleArgumentsProvidedForFunction,
     OperatorAtEndOfExpression,
-    OperationNeedsNumber
+    OperationNeedsNumber,
+    MaximumDepthReached
 }

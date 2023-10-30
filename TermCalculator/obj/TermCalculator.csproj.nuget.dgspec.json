@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/computerelite/rider/TermCalculator/TermCalculator/TermCalculator.csproj": {}
+    "/workspaces/TermCalculator/TermCalculator/TermCalculator.csproj": {}
   },
   "projects": {
-    "/home/computerelite/rider/TermCalculator/TermCalculator/TermCalculator.csproj": {
+    "/workspaces/TermCalculator/TermCalculator/TermCalculator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/computerelite/rider/TermCalculator/TermCalculator/TermCalculator.csproj",
+        "projectUniqueName": "/workspaces/TermCalculator/TermCalculator/TermCalculator.csproj",
         "projectName": "TermCalculator",
-        "projectPath": "/home/computerelite/rider/TermCalculator/TermCalculator/TermCalculator.csproj",
-        "packagesPath": "/home/computerelite/.nuget/packages/",
-        "outputPath": "/home/computerelite/rider/TermCalculator/TermCalculator/obj/",
+        "projectPath": "/workspaces/TermCalculator/TermCalculator/TermCalculator.csproj",
+        "packagesPath": "/home/codespace/.nuget/packages/",
+        "outputPath": "/workspaces/TermCalculator/TermCalculator/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/computerelite/.nuget/NuGet/NuGet.Config"
+          "/home/codespace/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
@@ -53,7 +53,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/7.0.109/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/dotnet/7.0.306/sdk/7.0.306/RuntimeIdentifierGraph.json"
         }
       }
     }
