@@ -15,7 +15,7 @@ public class Parser
         foreach (char c in expression)
         {
             ExpressionPartType t = GetTypeOfExpressionStringPart(c.ToString());
-            if (t != lastType)
+            if (t != lastType || (t == lastType && IsSingle(lastType)))
             {
                 expressionStringParts.Add(tmp);
                 tmp = "";
@@ -36,6 +36,37 @@ public class Parser
 
         return e;
     }
+
+    public static bool IsSingle(ExpressionPartType type) {
+        switch(type) {
+            case ExpressionPartType.Invalid:
+                return false;
+            case ExpressionPartType.Add:
+                return true;
+            case ExpressionPartType.Subtract:
+                return true;
+            case ExpressionPartType.Multiply:
+                return true;
+            case ExpressionPartType.Divide:
+                return true;
+            case ExpressionPartType.ParenthesisOpen:
+                return true;
+            case ExpressionPartType.ParenthesisClose:
+                return true;
+            case ExpressionPartType.Exponentiation:
+                return true;
+            case ExpressionPartType.Equal:
+                return true;
+            case ExpressionPartType.Number:
+                return false;
+            case ExpressionPartType.Function:
+                return false;
+            case ExpressionPartType.Variable:
+                return false;
+            default:
+                return false;
+        }
+    } 
 
     /// <summary>
     /// Parses an expression part string into an ExpressionPart

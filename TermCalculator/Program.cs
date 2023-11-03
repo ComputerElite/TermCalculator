@@ -7,10 +7,10 @@ ExpressionEvaluator.maxDepth = 20;
 ExpressionEvaluator.showDebugInfo = false;
 
 Expression e1 = Parser.ParseExpression("2*x^(-2)");
-Expression e2 = Parser.ParseExpression("( (-4)/27)*x+2/3");
-//e2.SetConstant("x", 0);
+Expression e2 = Parser.ParseExpression("((-4)/27)*x+2/3");
+e2.SetConstant("x", 0);
 //e2.EvaluateExpression().PrintHumanReadable();
-//Parser.ParseExpression("((-4)/27)*0+2/3").EvaluateExpression().PrintHumanReadable();
+Parser.ParseExpression("((-4)/27)*0+2/3").EvaluateExpression().PrintHumanReadable();
 
 string expression = "x^4";
 Expression e = Parser.ParseExpression(expression);
