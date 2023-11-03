@@ -30,8 +30,15 @@ public class Functions
         },
     };
 
+    public Functions(Functions toClone) {
+        this.functions = new Dictionary<string, Function>(toClone.functions);
+    }
+
+    public Functions() {}
+
     public void AddConstantToFunctions(string name, double value)
     {
+        if(functions.ContainsKey(name)) functions.Remove(name);
         functions.Add(name, new Function(0, name, (expression, functionOccurrenceIndex, self) =>
         {
             return ReplaceExpressionAndArgumentsWithNumberResult(expression, functionOccurrenceIndex, self, value);
@@ -108,5 +115,11 @@ public class Functions
         string functionName = expression[occurrenceIndex].function;
         if (!ContainsFunction(functionName, int.MaxValue)) return expression;
         return functions[functionName].Run(expression, occurrenceIndex);
+    }
+
+    public double GetFunctionValue(string functionName)
+    {
+        if (!ContainsFunction(functionName, 0)) return double.NaN;
+        return functions[functionName].GetValue();
     }
 }

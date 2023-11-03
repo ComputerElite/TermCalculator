@@ -27,10 +27,10 @@ public class ExpressionEvaluator
             return expression;
         }
         DisplayDebugExpression(expression, "Evaluating depth " + expression.depth, new List<int>(), new List<int>());
-        
         expression = EvaluateParentheses(expression);
         
         // Remove all SEPARATORS
+        DisplayDebugInfo("RemoveSeperators");
         expression = RemoveSeparators(expression);
 
         // Replaces all constants
@@ -176,6 +176,8 @@ public class ExpressionEvaluator
     {
         if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         expression = FindFirstParentheses(expression);
+        DisplayDebugInfo(expression.parenthesesSearchResult.closeIndex.ToString());
+        DisplayDebugInfo(expression.parenthesesSearchResult.openIndex.ToString());
         if (!expression.parenthesesSearchResult.found) return expression;
         // Parenthesis have been found, evaluate expression inside parenthesis
         DisplayDebugExpression(expression, "Evaluating parentheses", new List<int> { expression.parenthesesSearchResult.openIndex, expression.parenthesesSearchResult.closeIndex }, Range(expression.parenthesesSearchResult.openIndex + 1, expression.parenthesesSearchResult.closeIndex - 1));
@@ -338,6 +340,79 @@ public class ExpressionEvaluator
 
         return clone;
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    public static Expression Derivative(Expression expression) {
+        // Split Expression parts at addition and subtraction
+        List<Expression> parts = SplitExpressionBy(expression, new List<ExpressionPartType> {ExpressionPartType.Add, ExpressionPartType.Subtract});
+
+        // ExponentRule
+        for(int i = 0; i < parts.Count; i++) {
+            if(!parts[i].evaluateThis) continue;
+            parts[i] = ExponentRule(parts[i]);
+        }
+        expression = MergeExpressionList(parts);
+        return expression;
+    }
+
+    public static Expression MergeExpressionList(List<Expression> expressionList) {
+        Expression done = new Expression();
+        for(int i = 0; i < expressionList.Count; i++) {
+            done.Append(expressionList[i]);
+        }
+        return done;
+    }
+
+    public static Expression ExponentRule(Expression e) {
+        DisplayDebugInfo("Evaluating exponent rule of " + e.HumanReadable() + " " + e.Count);
+        
+        for(int i = 0; i < e.Count && i < 10; i++) {
+            DisplayDebugInfo(i.ToString());
+            if(e[i].type != ExpressionPartType.Exponentiation) continue;
+            // Decrement exponent by 1 and multiply by original exponent
+            double exponentNumber = e[i+1].number;
+            // ToDo: Check if exponent is whole number
+            // Decrement exponent
+            e[i+1].number -= 1;
+            e.Insert(i-1, ExpressionPart.Multiply);
+            e.Insert(i-1, ExpressionPart.Number(exponentNumber));
+            i += 2;
+        }
+        return e;
+    }
+
+    /// <summary>
+    /// Splits an Expression at the given ExpressionPartTypes.
+    /// E. g. 2*x+8 will give back
+    /// 2*x    processThis: true
+    /// +      processThis: false
+    /// 8      processThis: true
+    /// </summary>
+    /// <param name="expression">Expression to split</param>
+    /// <param name="types">Types to split the Expression at</param>
+    /// <returns>The split expression</returns>
+    public static List<Expression> SplitExpressionBy(Expression expression, List<ExpressionPartType> types) {
+        // Split Expression parts at addition and subtraction
+        List<Expression> parts = new List<Expression>();
+        Expression current = new Expression();
+        for(int i = 0; i < expression.Count; i++) {
+            if(types.Contains(expression[i].type)) {
+                parts.Add(current.SetEvaluateThis(true));
+                parts.Add(expression[i].ToExpression().SetEvaluateThis(false));
+                current = new Expression();
+            } else {
+                current.Append(expression[i]);
+            }
+        }
+        parts.Add(current);
+        return parts;
+    }
+
+        
 
     /// <summary>
     /// Multiplies out an expression. Must contain 2 pairs of parentheses

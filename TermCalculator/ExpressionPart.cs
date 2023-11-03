@@ -40,8 +40,19 @@ public class ExpressionPart
         part.number = value;
         return part;
     }
+
+    public static ExpressionPart Function(string function)
+    {
+        ExpressionPart part = new ExpressionPart(ExpressionPartType.Function);
+        part.function = function;
+        return part;
+    }
     
     public ExpressionPart() {}
+
+    public Expression ToExpression() {
+        return new Expression(this);
+    }
         
 
     /// <summary>
@@ -74,7 +85,7 @@ public class ExpressionPart
         return GetTypeNamePadded() + GetExtra();
     }
 
-    public string HumanReadable()
+    public string HumanReadable(Expression parentExpression, bool expandFunction)
     {
         switch (type)
         {
@@ -95,7 +106,11 @@ public class ExpressionPart
             case ExpressionPartType.Exponentiation:
                 return "^";
             case ExpressionPartType.Function:
-                return function;
+                if(expandFunction) {
+                    double v =parentExpression.GetFunctionValueIfPresent(function);
+                    if(double.IsNaN(v)) return function;
+                    else return v.ToString();
+                } else return function;
             case ExpressionPartType.Number:
                 return number.ToString();
             case ExpressionPartType.Separator:

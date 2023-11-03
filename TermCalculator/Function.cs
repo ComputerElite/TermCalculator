@@ -21,6 +21,14 @@ public class Function
         this.function = function;
     }
 
+    public double GetValue() {
+        if(argumentsNeeded > 0) return 0;
+        Expression e = new Expression();
+        e.Append(ExpressionPart.Function(name));
+        e = Run(e, 0);
+        return e[0].number;
+    }
+
     public Expression Run(Expression expression, int functionOccurrenceIndex)
     {
         // Check if all arguments needed to run the function are present

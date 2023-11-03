@@ -7,10 +7,18 @@ public class Expression
     public EvaluationResult evaluationResult = EvaluationResult.NotEvaluated;
     public EvaluationResultDetails evaluationResultDetails = new EvaluationResultDetails();
 
+    /// <summary>
+    /// Used in for loops. Usually indicates how far back i has to go so you we can continue processing where we left of/replaced stuff.
+    /// </summary>
     public int decrementI = 0;
     public ParenthesesSearchResult parenthesesSearchResult = new ParenthesesSearchResult();
     
     public static Expression NaN => new Expression(double.NaN);
+    /// <summary>
+    /// Used when splitting expression to mark parts that should get processed.
+    /// This way other parts can be skipped
+    /// </summary>
+    public bool evaluateThis = true;
     
     /// <summary>
     /// Functions stores variable values and functions which can be executed by the evaluator
@@ -46,6 +54,14 @@ public class Expression
     {
         parts.Add(ExpressionPart.Number(number));
     }
+
+    /// <summary>
+    /// Creates a new Expression with a given ExpressionPart as content
+    /// </summary>
+    /// <param name="part">Part the Expression should contain</param>
+    public Expression(ExpressionPart part) {
+        parts.Add(part);
+    }
     
     public Expression() {}
     
@@ -59,6 +75,16 @@ public class Expression
     }
 
     /// <summary>
+    /// Set the evaluateThis variable to the given value and gives back the expression
+    /// </summary>
+    /// <param name="evaluateThis">Value for evaluateThis</param>
+    /// <returns>This expression</returns>
+    public Expression SetEvaluateThis(bool evaluateThis) {
+        this.evaluateThis = evaluateThis;
+        return this;
+    }
+
+    /// <summary>
     /// Creates a copy of the object
     /// </summary>
     /// <returns>a copy of the object</returns>
@@ -69,7 +95,7 @@ public class Expression
         n.depth = this.depth;
         n.evaluationResult = this.evaluationResult;
         n.evaluationResultDetails = this.evaluationResultDetails;
-        n.functions = this.functions;
+        n.functions = new Functions(this.functions);
         n.decrementI = this.decrementI;
         n.parenthesesSearchResult = this.parenthesesSearchResult;
         return n;
@@ -159,8 +185,10 @@ public class Expression
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine();
             Console.WriteLine();
-            Console.WriteLine("EVALUATION FAILED!");
+            Console.WriteLine("EVALUATION FAILED!!!");
             Console.WriteLine(Enum.GetName(typeof(EvaluationResultDetailsEnum), evaluationResultDetails.detailsEnum));
+            Console.WriteLine(evaluationResultDetails.extraInfostring);
+            Console.WriteLine();
             if (evaluationResultDetails.referenceIndices.Count > 0)
             {
                 // If reference indices are available show where the evaluator thinks the issue is
@@ -193,17 +221,22 @@ public class Expression
         return this;
     }
 
-    public void PrintHumanReadable()
+    public void PrintHumanReadable(bool expandFunctions = false)
     {
-        Console.WriteLine(HumanReadable());
+        Console.WriteLine(HumanReadable(expandFunctions));
     }
 
-    public string HumanReadable()
+    public double GetFunctionValueIfPresent(string functionName) {
+        if(!functions.ContainsFunction(functionName, 0)) return double.NaN;
+        return functions.GetFunctionValue(functionName);
+    }
+
+    public string HumanReadable(bool expandFunctions = false)
     {
         string s = "";
         for (int i = 0; i < this.Count; i++)
         {
-            s += this[i].HumanReadable();
+            s += this[i].HumanReadable(this, expandFunctions);
         }
 
         return s;
