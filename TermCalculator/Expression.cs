@@ -15,10 +15,10 @@ public class Expression
     
     public static Expression NaN => new Expression(double.NaN);
     /// <summary>
-    /// Used when splitting expression to mark parts that should get processed.
+    /// Used when splitting expression to mark split points.
     /// This way other parts can be skipped
     /// </summary>
-    public bool evaluateThis = true;
+    public bool isSplitPoint = true;
     
     /// <summary>
     /// Functions stores variable values and functions which can be executed by the evaluator
@@ -79,8 +79,8 @@ public class Expression
     /// </summary>
     /// <param name="evaluateThis">Value for evaluateThis</param>
     /// <returns>This expression</returns>
-    public Expression SetEvaluateThis(bool evaluateThis) {
-        this.evaluateThis = evaluateThis;
+    public Expression SetSplitPoint(bool isSplitPoint) {
+        this.isSplitPoint = isSplitPoint;
         return this;
     }
 

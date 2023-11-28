@@ -4,14 +4,22 @@ using TermCalculator;
 // Fix infinite loop when parentheses evaluation returns parentheses
 
 ExpressionEvaluator.maxDepth = 20;
-ExpressionEvaluator.showDebugInfo = false;
+ExpressionEvaluator.showDebugInfo = true;
 
+Expression e = Parser.ParseExpression("1/2+3/4");
+ExpressionEvaluator.CommutateExpressionAndMultiplyNumbers(e).PrintHumanReadable();
+/*
+return;
+Expression s = Parser.ParseExpression("1/2*a*t^2");
+ExpressionEvaluator.Derivative(s).EvaluateExpression().DisplayExpression();
+
+return;
 Expression e1 = Parser.ParseExpression("2*x^(-2)");
 Expression e2 = Parser.ParseExpression("((-4)/27)*x+2/3");
 e2.SetConstant("x", 0);
-//e2.EvaluateExpression().PrintHumanReadable();
+e2.PrintHumanReadable(true);
 Parser.ParseExpression("((-4)/27)*0+2/3").EvaluateExpression().PrintHumanReadable();
-
+return;
 string expression = "x^4";
 Expression e = Parser.ParseExpression(expression);
 double pX = 2;

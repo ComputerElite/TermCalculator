@@ -16,8 +16,11 @@ public class ExpressionEvaluator
     {
         if (expression.evaluationResult != EvaluationResult.Evaluating)
         {
-            if (expression.evaluationResult != EvaluationResult.NotEvaluated)
+            if (expression.evaluationResult != EvaluationResult.NotEvaluated) {
+                DisplayDebugInfo("Expression has failed evaluation, returning depth" + expression.depth);
                 return expression;
+            }
+                
             expression.evaluationResult = EvaluationResult.Evaluating;
         }
         if(expression.depth > maxDepth) {
@@ -30,7 +33,6 @@ public class ExpressionEvaluator
         expression = EvaluateParentheses(expression);
         
         // Remove all SEPARATORS
-        DisplayDebugInfo("RemoveSeperators");
         expression = RemoveSeparators(expression);
 
         // Replaces all constants
@@ -176,8 +178,6 @@ public class ExpressionEvaluator
     {
         if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         expression = FindFirstParentheses(expression);
-        DisplayDebugInfo(expression.parenthesesSearchResult.closeIndex.ToString());
-        DisplayDebugInfo(expression.parenthesesSearchResult.openIndex.ToString());
         if (!expression.parenthesesSearchResult.found) return expression;
         // Parenthesis have been found, evaluate expression inside parenthesis
         DisplayDebugExpression(expression, "Evaluating parentheses", new List<int> { expression.parenthesesSearchResult.openIndex, expression.parenthesesSearchResult.closeIndex }, Range(expression.parenthesesSearchResult.openIndex + 1, expression.parenthesesSearchResult.closeIndex - 1));
@@ -220,6 +220,7 @@ public class ExpressionEvaluator
         Expression result;
         // ToDo:
         // - Check if prevNumber and nextNumber are variables and if so return expression as is
+        if(!prevNumber.IsNumber && !nextNumber.IsNumber) return expression.DecrementI(0);
         if (!prevNumber.IsNumber)
         {
             // The operation is tried to be evaluated without a valid number
@@ -352,7 +353,7 @@ public class ExpressionEvaluator
 
         // ExponentRule
         for(int i = 0; i < parts.Count; i++) {
-            if(!parts[i].evaluateThis) continue;
+            if(parts[i].isSplitPoint) continue;
             parts[i] = ExponentRule(parts[i]);
         }
         expression = MergeExpressionList(parts);
@@ -368,10 +369,9 @@ public class ExpressionEvaluator
     }
 
     public static Expression ExponentRule(Expression e) {
-        DisplayDebugInfo("Evaluating exponent rule of " + e.HumanReadable() + " " + e.Count);
+        DisplayDebugInfo("Evaluating exponent rule of " + e.HumanReadable());
         
-        for(int i = 0; i < e.Count && i < 10; i++) {
-            DisplayDebugInfo(i.ToString());
+        for(int i = 0; i < e.Count; i++) {
             if(e[i].type != ExpressionPartType.Exponentiation) continue;
             // Decrement exponent by 1 and multiply by original exponent
             double exponentNumber = e[i+1].number;
@@ -385,6 +385,32 @@ public class ExpressionEvaluator
         return e;
     }
 
+    public static Expression CommutateExpressionAndMultiplyNumbers(Expression expression) {
+        // 1. Rewrite divisions as multiplication
+        //      To do this Split the expression at all operators using the SplitExpressionBy method as it'll ignore parentheses
+        List<Expression> splitAtOperands = SplitExpressionBy(expression, ExpressionPartTypes.Operands);
+        //      Then iterate over the split expression and check if there are any divisions
+        for(int i = 0; i < splitAtOperands.Count; i++) {
+            if(!splitAtOperands[i].isSplitPoint) continue;
+            if(splitAtOperands[i][0].IsDivide) {
+                splitAtOperands[i][0].type = ExpressionPartType.Multiply;
+                splitAtOperands[i+1].Append(ExpressionPart.ParanthesisClose);
+                splitAtOperands[i+1].Insert(0, ExpressionPart.ParanthesisOpen);
+                splitAtOperands[i+1].Insert(0, ExpressionPart.Divide);
+                splitAtOperands[i+1].Insert(0, ExpressionPart.Number(1));
+                // Now evaluate i + 1 to get a number for the multiplication
+                splitAtOperands[i+1] = EvaluateExpression(splitAtOperands[i+1]);
+                if(splitAtOperands[i+1].Count > 1) {
+                    splitAtOperands[i+1].Append(ExpressionPart.ParanthesisClose);
+                    splitAtOperands[i+1].Insert(0, ExpressionPart.ParanthesisClose);
+                }
+            }
+        }
+        expression = MergeExpressionList(splitAtOperands);
+        // 2. Split expression at multiplication and then multiply all numbers that can be found if they are just numbers and thus have a length of 1
+        return expression;
+    }
+
     /// <summary>
     /// Splits an Expression at the given ExpressionPartTypes.
     /// E. g. 2*x+8 will give back
@@ -392,17 +418,21 @@ public class ExpressionEvaluator
     /// +      processThis: false
     /// 8      processThis: true
     /// </summary>
-    /// <param name="expression">Expression to split</param>
+    /// <param name="expression">Expression to split (Should not include parentheses)</param>
     /// <param name="types">Types to split the Expression at</param>
     /// <returns>The split expression</returns>
     public static List<Expression> SplitExpressionBy(Expression expression, List<ExpressionPartType> types) {
         // Split Expression parts at addition and subtraction
+        // ToDo: Do not split in parentheses
         List<Expression> parts = new List<Expression>();
         Expression current = new Expression();
+        int parenthesesCount = 0;
         for(int i = 0; i < expression.Count; i++) {
-            if(types.Contains(expression[i].type)) {
-                parts.Add(current.SetEvaluateThis(true));
-                parts.Add(expression[i].ToExpression().SetEvaluateThis(false));
+            if(expression[i].type == ExpressionPartType.ParenthesisOpen) parenthesesCount++;
+            if(expression[i].type == ExpressionPartType.ParenthesisClose) parenthesesCount--;
+            if(types.Contains(expression[i].type) && parenthesesCount == 0) {
+                parts.Add(current.SetSplitPoint(false));
+                parts.Add(expression[i].ToExpression().SetSplitPoint(true));
                 current = new Expression();
             } else {
                 current.Append(expression[i]);
