@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "GE+QNrbs9mRLSvxs5+JV1gmZBVt2He6T+E+aKZYKU8xpypLzscVeSILRaVBU8B3su8fgnixXT1QX/vXYsUa/gg==",
+  "dgSpecHash": "sYEHVj8XF474YjnzKvDKNvBo85Tsql1hbHgUWtRBIoPSKpZeuOPFlfUTiBCJyIrKxvMmOfLvJsqQQ9PBsNCeiA==",
   "success": true,
   "projectFilePath": "/workspaces/TermCalculator/TermCalculator/TermCalculator.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/codespace/.nuget/packages/microsoft.netcore.app.ref/7.0.15/microsoft.netcore.app.ref.7.0.15.nupkg.sha512",
+    "/home/codespace/.nuget/packages/microsoft.aspnetcore.app.ref/7.0.15/microsoft.aspnetcore.app.ref.7.0.15.nupkg.sha512",
+    "/home/codespace/.nuget/packages/microsoft.netcore.app.host.linux-x64/7.0.15/microsoft.netcore.app.host.linux-x64.7.0.15.nupkg.sha512"
+  ],
   "logs": []
 }

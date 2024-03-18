@@ -18,7 +18,6 @@
 /workspaces/TermCalculator/TermCalculator/bin/Debug/net7.0/TermCalculator.runtimeconfig.json
 /workspaces/TermCalculator/TermCalculator/bin/Debug/net7.0/TermCalculator.dll
 /workspaces/TermCalculator/TermCalculator/bin/Debug/net7.0/TermCalculator.pdb
-/workspaces/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.csproj.AssemblyReference.cache
 /workspaces/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.GeneratedMSBuildEditorConfig.editorconfig
 /workspaces/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.AssemblyInfoInputs.cache
 /workspaces/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.AssemblyInfo.cs
@@ -28,3 +27,4 @@
 /workspaces/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.pdb
 /workspaces/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.genruntimeconfig.cache
 /workspaces/TermCalculator/TermCalculator/obj/Debug/net7.0/ref/TermCalculator.dll
+/workspaces/TermCalculator/TermCalculator/obj/Debug/net7.0/TermCalculator.sourcelink.json

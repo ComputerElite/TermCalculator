@@ -55,14 +55,13 @@ public class ExpressionEvaluator
 
     static Expression AddMultiplyOperationBetweenAdjacentNumbersAndFunctions(Expression expression)
     {
-        
         if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         for (int i = 0; i < expression.Count - 1; i++)
         {
             ExpressionPartType t = expression[i].type;
             ExpressionPartType nt = expression[i + 1].type;
-            if ((t == ExpressionPartType.Number || t == ExpressionPartType.Function) &&
-                (nt == ExpressionPartType.Number || nt == ExpressionPartType.Function))
+            if ((t == ExpressionPartType.Number || t == ExpressionPartType.Function || t == ExpressionPartType.ParenthesisClose) &&
+                (nt == ExpressionPartType.Number || nt == ExpressionPartType.Function || t == ExpressionPartType.ParenthesisClose))
             {
                 // Adjacent functions/numbers have been found. A multiply operation must be added so it can be evaluated
                 expression.Insert(i+1, ExpressionPart.Multiply);
@@ -129,6 +128,7 @@ public class ExpressionEvaluator
 
     static Expression FindFirstParentheses(Expression expression, int startAt = 0)
     {
+        Console.WriteLine(expression.evaluationResult.ToString());
         if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         expression.parenthesesSearchResult = new ParenthesesSearchResult();
         int parenthesisCounter = 0;
@@ -360,8 +360,14 @@ public class ExpressionEvaluator
         return expression;
     }
 
+    /// <summary>
+    /// Merges expressions into an Expression. Expression will be set to evaluating
+    /// </summary>
+    /// <param name="expressionList">Expressions to merge</param>
+    /// <returns></returns>
     public static Expression MergeExpressionList(List<Expression> expressionList) {
         Expression done = new Expression();
+        done.SetEvaluating();
         for(int i = 0; i < expressionList.Count; i++) {
             done.Append(expressionList[i]);
         }
@@ -386,6 +392,10 @@ public class ExpressionEvaluator
     }
 
     public static Expression CommutateExpressionAndMultiplyNumbers(Expression expression) {
+        /*
+        // Why did I do this? It prolly had a reason or so so uuuh yes. Someone explain please
+        // Otherwise I wouldn't have done the shit cause it's work
+        //
         // 1. Rewrite divisions as multiplication
         //      To do this Split the expression at all operators using the SplitExpressionBy method as it'll ignore parentheses
         List<Expression> splitAtOperands = SplitExpressionBy(expression, ExpressionPartTypes.Operands);
@@ -407,7 +417,36 @@ public class ExpressionEvaluator
             }
         }
         expression = MergeExpressionList(splitAtOperands);
+        */
+        expression = AddMultiplyOperationBetweenAdjacentNumbersAndFunctions(expression);
         // 2. Split expression at multiplication and then multiply all numbers that can be found if they are just numbers and thus have a length of 1
+        int lastNumber = -1;
+        for(int i = 0; i < expression.Count; i++) {
+            if(expression[i].IsNumber) {
+                if(lastNumber != -1) {
+                    double number = expression[i].number;
+                    DisplayDebugExpression(expression, "Multiplying commutate", new List<int> {lastNumber+1}, new List<int> {lastNumber, i});
+                    expression.RemoveAt(i);
+                    i--;
+                    expression.RemoveAt(i);
+                    i--;
+                    expression[lastNumber].number = expression[lastNumber].number * number;
+                    i = lastNumber;
+                }
+                lastNumber = i;
+                continue;
+            }
+            if(expression[i].IsParenthesisOpen) {
+                // Skip to closing parenthesis
+                expression = FindFirstParentheses(expression, 0);
+                DisplayDebugExpression(expression, "Skipping paranthesis", new List<int> {i, expression.parenthesesSearchResult.closeIndex}, new List<int>());
+                i = expression.parenthesesSearchResult.closeIndex;
+                continue;
+            }
+            if(!expression[i].IsMultiply && !expression[i].IsNumberOrFunction) {
+                lastNumber = -1;
+            }
+        }
         return expression;
     }
 

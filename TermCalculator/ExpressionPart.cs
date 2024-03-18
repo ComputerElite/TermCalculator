@@ -22,6 +22,8 @@ public class ExpressionPart
     public bool IsSubtract => type == ExpressionPartType.Subtract;
     public bool IsMultiply => type == ExpressionPartType.Multiply;
     public bool IsDivide => type == ExpressionPartType.Divide;
+    public bool IsParenthesisOpen => type == ExpressionPartType.ParenthesisOpen;
+    public bool IsParenthesisClose => type == ExpressionPartType.ParenthesisClose;
     public bool IsAddOrSubtract => IsAdd || IsSubtract;
     public bool IsNumberOrFunction => IsFunction || IsNumber;
     public static ExpressionPart Multiply => new ExpressionPart(ExpressionPartType.Multiply);
