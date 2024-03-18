@@ -4,18 +4,19 @@ using TermCalculator;
 // ToDo: Fix infinite loop when parentheses evaluation returns parentheses
 
 ExpressionEvaluator.maxDepth = 20;
-ExpressionEvaluator.showDebugInfo = true;
-Expression e = Parser.ParseExpression("2(x+2)5+5x*9");
+ExpressionEvaluator.showDebugInfo = false;
+Expression e = Parser.ParseExpression("2x^2+5x*9+5");
 e.SetEvaluating();
 e = ExpressionEvaluator.CommutateExpressionAndMultiplyNumbers(e);
 e.DisplayExpression();
+Console.WriteLine("Expression");
 e.PrintHumanReadable();
-/*
 Expression e1 = ExpressionEvaluator.Derivative(e).EvaluateExpression();
+Console.WriteLine("First Derivative");
 e1.PrintHumanReadable();
 Expression e2 = ExpressionEvaluator.Derivative(e1).EvaluateExpression();
+Console.WriteLine("Second Derivative");
 e2.PrintHumanReadable();
-*/
 //Graphing.DrawGraph(Graphing.GraphFunction(ExpressionEvaluator.Derivative(e), -2, 2, -10, 10, 50, 30), 50, 30);
 
 /*

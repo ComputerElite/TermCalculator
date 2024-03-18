@@ -32,7 +32,7 @@ public class ExpressionEvaluator
         DisplayDebugExpression(expression, "Evaluating depth " + expression.depth, new List<int>(), new List<int>());
         expression = EvaluateParentheses(expression);
         
-        // Remove all SEPARATORS
+        // Remove all Seperators
         expression = RemoveSeparators(expression);
 
         // Replaces all constants
@@ -48,8 +48,44 @@ public class ExpressionEvaluator
         
         expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Add, ExpressionPartType.Subtract});
 
-        if (expression.depth == 0) expression.evaluationResult = EvaluationResult.EvaluatedSuccessfully;
+        if (expression.depth == 0) {
+            expression.evaluationResult = EvaluationResult.EvaluatedSuccessfully;
+            // At last: Simplify
+            expression = Simplify(expression);
+        }
         DisplayDebugExpression(expression, "Evaluated at depth " + expression.depth, new List<int>(), new List<int>());
+        return expression;
+    }
+
+    /// <summary>
+    /// Simplifies an expression to the greatest extend the calculator can do by combining different elements.
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    public static Expression Simplify(Expression expression) {
+        expression = CommutateExpressionAndMultiplyNumbers(expression);
+        expression = SimplifyConstantExponent(expression);
+        return expression;
+    }
+
+    /// <summary>
+    /// Simplifies everything which is raised to the power of 0
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    public static Expression SimplifyConstantExponent(Expression expression) {
+        for(int i = 0; i < expression.Count; i++) {
+            if(!expression[i].IsExponentiation) continue;
+            if(!expression[i+1].IsNumber) continue;
+            if(expression[i+1].number != 0 && expression[i+1].number != 1) continue;
+            if(expression[i-1].IsParenthesisClose) continue;
+            if(expression[i+1].number == 0) {
+                expression[i-1].number = 1;
+                expression[i-1].type = ExpressionPartType.Number;
+            }
+            expression.RemoveAt(i+1);
+            expression.RemoveAt(i);
+        }
         return expression;
     }
 
@@ -128,7 +164,6 @@ public class ExpressionEvaluator
 
     static Expression FindFirstParentheses(Expression expression, int startAt = 0)
     {
-        Console.WriteLine(expression.evaluationResult.ToString());
         if (expression.evaluationResult != EvaluationResult.Evaluating) return expression;
         expression.parenthesesSearchResult = new ParenthesesSearchResult();
         int parenthesisCounter = 0;
@@ -349,8 +384,7 @@ public class ExpressionEvaluator
     /// <returns></returns>
     public static Expression Derivative(Expression expression) {
         // Split Expression parts at addition and subtraction
-        List<Expression> parts = SplitExpressionBy(expression, new List<ExpressionPartType> {ExpressionPartType.Add, ExpressionPartType.Subtract});
-
+        List<Expression> parts = SplitExpressionBy(expression, ExpressionPartTypes.LineCalculation);
         // ExponentRule
         for(int i = 0; i < parts.Count; i++) {
             if(parts[i].isSplitPoint) continue;
@@ -374,11 +408,25 @@ public class ExpressionEvaluator
         return done;
     }
 
+    /// <summary>
+    /// Evaluates the exponent rule one something the style of 5*x^2. There mustn't be additions or subtractions.
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public static Expression ExponentRule(Expression e) {
         DisplayDebugInfo("Evaluating exponent rule of " + e.HumanReadable());
-        
+        // Add ^1 to all x
+        bool somethingChanged = false;
         for(int i = 0; i < e.Count; i++) {
+            if(e[i].type == ExpressionPartType.Function) {
+                if(i + 1 >= e.Count || e[i+1].type != ExpressionPartType.Exponentiation) {
+                    // ToDo: check if it's x
+                    e.Insert(i+1, ExpressionPart.Number(1));
+                    e.Insert(i+1, ExpressionPart.Exponentiation);
+                }
+            }
             if(e[i].type != ExpressionPartType.Exponentiation) continue;
+            if(e[i-1].type != ExpressionPartType.Function) continue; // it doesn't apply to non variables duh
             // Decrement exponent by 1 and multiply by original exponent
             double exponentNumber = e[i+1].number;
             // ToDo: Check if exponent is whole number
@@ -387,7 +435,9 @@ public class ExpressionEvaluator
             e.Insert(i-1, ExpressionPart.Multiply);
             e.Insert(i-1, ExpressionPart.Number(exponentNumber));
             i += 2;
+            somethingChanged = true;
         }
+        if(!somethingChanged) return new Expression(0); // If no exponent was changed there's no x and thus the part of the expression gets lost in the derivative
         return e;
     }
 
@@ -477,7 +527,7 @@ public class ExpressionEvaluator
                 current.Append(expression[i]);
             }
         }
-        parts.Add(current);
+        parts.Add(current.SetSplitPoint(false));
         return parts;
     }
 
