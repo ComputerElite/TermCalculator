@@ -131,7 +131,6 @@ public class Expression
         for(int i = 0; i < Count; i++) {
             n.parts.Add(this[i].Clone());
         }
-        n.parts = new List<ExpressionPart>(this.parts);
         n.depth = this.depth;
         n.evaluationResult = this.evaluationResult;
         n.evaluationResultDetails = this.evaluationResultDetails;

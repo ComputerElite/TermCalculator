@@ -4,7 +4,7 @@ namespace TermCalculator;
 public class ExpressionCreator {
     public static Expression GetTangent(Expression e, double x) {
         // Get m
-        Expression tangent = Parser.ParseExpression("m*x-m*u+y");
+        Expression tangent = Parser.ParseExpression("m*x-m*u+b");
         
         Expression derivative = ExpressionEvaluator.Derivative(e.Clone()).EvaluateExpression();
         derivative.SetConstant("x", x);
@@ -18,12 +18,14 @@ public class ExpressionCreator {
         e.SetConstant("x", x);
         Console.WriteLine("for y");
         e.PrintHumanReadable();
-        e = e.EvaluateExpression();
+        e.EvaluateExpression();
         e.ExtractNumericalAnswer();
         if(e.returnedNumeric == null) return e.CloneEvaluationResultIntoEmptyExpression();
         double y = e.returnedNumeric.Value;
+        Console.WriteLine("y: " + y);
+        Console.WriteLine("m: " + m);
         tangent.SetConstant("m", m);
-        tangent.SetConstant("y", y);
+        tangent.SetConstant("b", y);
         tangent.SetConstant("u", x);
         return tangent.EvaluateExpression();
     }

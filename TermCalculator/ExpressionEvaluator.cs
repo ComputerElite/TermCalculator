@@ -46,6 +46,8 @@ public class ExpressionEvaluator
         
         expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Multiply, ExpressionPartType.Divide});
         
+        expression = ReplaceSubtractionsWithAdditions(expression);
+
         expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Add, ExpressionPartType.Subtract});
 
         if (expression.depth == 0) {
@@ -57,14 +59,24 @@ public class ExpressionEvaluator
         return expression;
     }
 
+    public static Expression ReplaceSubtractionsWithAdditions(Expression e) {
+        for(int i = 1; i < e.Count; i++) {
+            if(e[i].type == ExpressionPartType.Number && e[i-1].type == ExpressionPartType.Subtract) {
+                e[i].number *= -1;
+                e[i-1].type = ExpressionPartType.Add;
+            }
+        }
+        return e;
+    }
+
     /// <summary>
     /// Simplifies an expression to the greatest extend the calculator can do by combining different elements.
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
     public static Expression Simplify(Expression expression) {
-        expression = CommutateExpressionAndMultiplyNumbers(expression);
-        expression = SimplifyConstantExponent(expression);
+        //expression = CommutateExpressionAndMultiplyNumbers(expression);
+        //expression = SimplifyConstantExponent(expression);
         return expression;
     }
 
