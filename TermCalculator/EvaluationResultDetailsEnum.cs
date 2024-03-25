@@ -8,5 +8,7 @@ public enum EvaluationResultDetailsEnum
     TooLittleArgumentsProvidedForFunction,
     OperatorAtEndOfExpression,
     OperationNeedsNumber,
-    MaximumDepthReached
+    MaximumDepthReached,
+    NoNumericResult,
+    NoDefiniteAnswer
 }

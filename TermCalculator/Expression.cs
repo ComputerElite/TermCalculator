@@ -11,6 +11,10 @@ public class Expression
     /// Used in for loops. Usually indicates how far back i has to go so you we can continue processing where we left of/replaced stuff.
     /// </summary>
     public int decrementI = 0;
+    /// <summary>
+    /// Numerical value which is returned by some processing functions. It's null if an error occurred or so
+    /// </summary>
+    public double? returnedNumeric = null;
     public ParenthesesSearchResult parenthesesSearchResult = new ParenthesesSearchResult();
     
     public static Expression NaN => new Expression(double.NaN);
@@ -44,6 +48,38 @@ public class Expression
     {
         functions.AddConstantToFunctions(name, value);
     }
+
+    /// <summary>
+    /// Returns an empty expression which has the evaluation result of this expression
+    /// </summary>
+    /// <returns></returns>
+    public Expression CloneEvaluationResultIntoEmptyExpression() {
+        Expression e = new Expression();
+        e.evaluationResult = this.evaluationResult;
+        e.evaluationResultDetails = this.evaluationResultDetails;
+        return e;
+    }
+
+    /// <summary>
+    /// This method checks the expression for one expression part with number and puts it into returnedNumeric.
+    /// Evaluation results will be set on this expression
+    /// </summary>
+    public void ExtractNumericalAnswer() {
+        returnedNumeric = null;
+        if(Count > 1) {
+            evaluationResult = EvaluationResult.EvaluationFail;
+            evaluationResultDetails.detailsEnum = EvaluationResultDetailsEnum.NoDefiniteAnswer;
+            evaluationResultDetails.extraInfostring = "Multiple Expression parts in evaluation result for m";
+            return;
+        }
+        if(!this[0].IsNumber) {
+            evaluationResult = EvaluationResult.EvaluationFail;
+            evaluationResultDetails.detailsEnum = EvaluationResultDetailsEnum.NoNumericResult;
+            evaluationResultDetails.extraInfostring = "No numeric result was returned for m";
+            return;
+        }
+        returnedNumeric = this[0].number;
+    }
     
     /// <summary>
     /// Creates an Expression with the number as only part
@@ -71,6 +107,7 @@ public class Expression
     /// <returns>evaluated expression</returns>
     public Expression EvaluateExpression()
     {
+        SetEvaluating();
         return ExpressionEvaluator.EvaluateExpression(this);
     }
 
@@ -91,6 +128,9 @@ public class Expression
     public Expression Clone()
     {
         Expression n = new Expression();
+        for(int i = 0; i < Count; i++) {
+            n.parts.Add(this[i].Clone());
+        }
         n.parts = new List<ExpressionPart>(this.parts);
         n.depth = this.depth;
         n.evaluationResult = this.evaluationResult;

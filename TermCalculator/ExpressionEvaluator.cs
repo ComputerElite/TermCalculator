@@ -152,7 +152,6 @@ public class ExpressionEvaluator
             if (expression[i].type != ExpressionPartType.Function) continue;
             string functionName = expression[i].function;
             if (!expression.functions.ContainsFunction(functionName, maxArgumentCount)) continue;
-            
             expression = expression.functions.EvaluateFunction(expression, i);
                     
             // Start iteration from beginning as we do not know how many expression parts were removed
@@ -253,9 +252,26 @@ public class ExpressionEvaluator
         ExpressionPart nextNumber = expression[occurrenceIndex + 1];
         ExpressionPartType operation = expression[occurrenceIndex].type;
         Expression result;
-        // ToDo:
-        // - Check if prevNumber and nextNumber are variables and if so return expression as is
         if(!prevNumber.IsNumber && !nextNumber.IsNumber) return expression.DecrementI(0);
+        if(prevNumber.IsNumber && nextNumber.IsFunction) {
+            if(operation == ExpressionPartType.Multiply) {
+                if(prevNumber.number == 0) {
+                    result = new Expression(0);
+                    return Replace(expression, occurrenceIndex == 0 ? 0 : occurrenceIndex - 1, occurrenceIndex + 1, result).DecrementI(occurrenceIndex == 0 ? 0 : 1);
+                }
+            }
+            return expression.DecrementI(0); // maybe remove in future?
+        }
+        if(prevNumber.IsFunction && nextNumber.IsNumber) {
+
+            if(operation == ExpressionPartType.Multiply) {
+                if(nextNumber.number == 0) {
+                    result = new Expression(0);
+                    return Replace(expression, occurrenceIndex == 0 ? 0 : occurrenceIndex - 1, occurrenceIndex + 1, result).DecrementI(occurrenceIndex == 0 ? 0 : 1);
+                }
+            }
+            return expression.DecrementI(0); // maybe remove in future?
+        }
         if (!prevNumber.IsNumber)
         {
             // The operation is tried to be evaluated without a valid number
@@ -371,7 +387,7 @@ public class ExpressionEvaluator
         clone.parts.Clear();
         for (int i = startIndex; i <= endIndex; i++)
         {
-            clone.parts.Add(expression.parts[i].Copy());
+            clone.parts.Add(expression.parts[i].Clone());
         }
 
         return clone;

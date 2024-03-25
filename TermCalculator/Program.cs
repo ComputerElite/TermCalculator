@@ -5,18 +5,17 @@ using TermCalculator;
 
 ExpressionEvaluator.maxDepth = 20;
 ExpressionEvaluator.showDebugInfo = false;
-Expression e = Parser.ParseExpression("2x^2+5x*9+5");
-e.SetEvaluating();
-e = ExpressionEvaluator.CommutateExpressionAndMultiplyNumbers(e);
+Expression e = Parser.ParseExpression("x^2+1");
 e.DisplayExpression();
 Console.WriteLine("Expression");
 e.PrintHumanReadable();
-Expression e1 = ExpressionEvaluator.Derivative(e).EvaluateExpression();
-Console.WriteLine("First Derivative");
-e1.PrintHumanReadable();
-Expression e2 = ExpressionEvaluator.Derivative(e1).EvaluateExpression();
-Console.WriteLine("Second Derivative");
-e2.PrintHumanReadable();
+Expression eOrg = Parser.ParseExpression(e.HumanReadable());
+Expression tangent = ExpressionCreator.GetTangent(e, 1);
+Console.WriteLine("Tangent");
+Console.WriteLine(tangent.evaluationResultDetails.extraInfostring);
+tangent.PrintHumanReadable();
+eOrg.PrintHumanReadable();
+//Graphing.GraphFunctions(new List<Expression> {eOrg, tangent}, -4, 4, 0, 16, 50, 20);
 //Graphing.DrawGraph(Graphing.GraphFunction(ExpressionEvaluator.Derivative(e), -2, 2, -10, 10, 50, 30), 50, 30);
 
 /*

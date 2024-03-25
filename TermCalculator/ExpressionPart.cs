@@ -65,7 +65,7 @@ public class ExpressionPart
     /// Creates a copy of this ExpressionPart
     /// </summary>
     /// <returns></returns>
-    public ExpressionPart Copy()
+    public ExpressionPart Clone()
     {
         ExpressionPart n = new ExpressionPart();
         n.type = this.type;

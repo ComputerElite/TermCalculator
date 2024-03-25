@@ -2,7 +2,7 @@ namespace TermCalculator;
 
 public class Functions
 {
-    Dictionary<string, Function> functions = new Dictionary<string, Function>
+    public Dictionary<string, Function> functions = new Dictionary<string, Function>
     {
         {
             "sin",
