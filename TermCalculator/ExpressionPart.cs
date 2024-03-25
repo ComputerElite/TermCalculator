@@ -81,7 +81,7 @@ public class ExpressionPart
 
     public string GetExtra()
     {
-        if (type == ExpressionPartType.Number) return number.ToString();
+        if (type == ExpressionPartType.Number) return Math.Round(number, 15).ToString(); // Btw you idiot if you want more precise shit just remove the round duh, but it will calculate with the precise number
         if (type == ExpressionPartType.Function || type == ExpressionPartType.Variable) return function;
         return "";
     }

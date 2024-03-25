@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TermCalculator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+edb5d50e2809108442716273d9dd5598ef9572b2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ed398bc3d75bd8e824e5ded3d9b87b5e81c31803")]
 [assembly: System.Reflection.AssemblyProductAttribute("TermCalculator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TermCalculator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

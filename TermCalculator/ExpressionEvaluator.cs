@@ -38,7 +38,7 @@ public class ExpressionEvaluator
         // Replaces all constants
         expression = EvaluateFunctions(expression, 0);
         // Evaluates all functions
-        expression = EvaluateFunctions(expression, 10000);
+        expression = EvaluateFunctions(expression, int.MaxValue);
         
         expression = EvaluateOperations(expression, new List<ExpressionPartType> {ExpressionPartType.Exponentiation});
 
@@ -625,7 +625,6 @@ public class ExpressionEvaluator
 
         return operands;
     }
-    
     static ExpressionPart GetCorrectOperandForAdditionOrSubtraction(ExpressionPart operationA,
         ExpressionPart operationB)
     {

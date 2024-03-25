@@ -79,6 +79,7 @@ public class Parser
         p.type = GetTypeOfExpressionStringPart(partString);
         if (p.type == ExpressionPartType.Number)
         {
+            if(partString.StartsWith(".")) partString = "0" + partString;
             p.number = double.Parse(partString);
         } else if (p.type == ExpressionPartType.Function)
         {
@@ -102,6 +103,7 @@ public class Parser
         if (part == "(") return ExpressionPartType.ParenthesisOpen;
         if (part == ")") return ExpressionPartType.ParenthesisClose;
         if (part == "^") return ExpressionPartType.Exponentiation;
+        if (part == ",") return ExpressionPartType.Separator;
         if (Regex.IsMatch(part.ToString(), @"^[A-Za-z]+$")) return ExpressionPartType.Function;
         if (part == "=") return ExpressionPartType.Equal;
         return ExpressionPartType.Invalid;
