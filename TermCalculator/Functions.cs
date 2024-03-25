@@ -17,6 +17,10 @@ public class Functions
             new Function(1, "tan", Tan)
         },
         {
+            "sqrt",
+            new Function(1, "sqrt", Sqrt)
+        },
+        {
             "pi",
             new Function(0, "pi", PI)
         },
@@ -58,6 +62,12 @@ public class Functions
     static Expression Sin(Expression expression, int functionOccurrenceIndex, Function self)
     {
         double res = Math.Sin(GetArgument(expression, functionOccurrenceIndex, 0));
+        return ReplaceExpressionAndArgumentsWithNumberResult(expression, functionOccurrenceIndex, self, res);
+    }
+    
+    static Expression Sqrt(Expression expression, int functionOccurrenceIndex, Function self)
+    {
+        double res = Math.Sqrt(GetArgument(expression, functionOccurrenceIndex, 0));
         return ReplaceExpressionAndArgumentsWithNumberResult(expression, functionOccurrenceIndex, self, res);
     }
     
