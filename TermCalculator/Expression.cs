@@ -61,6 +61,20 @@ public class Expression
     }
 
     /// <summary>
+    ///  
+    /// </summary>
+    /// <returns>A list of all functions in the expression that are unknown to the expression.</returns>
+    public List<string> GetUnassignedFunctions() {
+        List<string> unknown = new List<string>();
+        for(int i = 0; i < this.Count; i++) {
+            if(this[i].type != ExpressionPartType.Function) continue;
+            if(functions.ContainsFunction(this[i].function, int.MaxValue)) continue;
+            unknown.Add(this[i].function);
+        }
+        return unknown;
+    }
+
+    /// <summary>
     /// This method checks the expression for one expression part with number and puts it into returnedNumeric.
     /// Evaluation results will be set on this expression
     /// </summary>

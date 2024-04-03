@@ -1,10 +1,16 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using TermCalculator;
+using TermCalculator.Shell;
 
 // ToDo: Fix infinite loop when parentheses evaluation returns parentheses
 
 ExpressionEvaluator.maxDepth = 20;
 ExpressionEvaluator.showDebugInfo = false;
+
+ExpressionShell shell = new ExpressionShell();
+shell.StartShell();
+return;
+
 Expression e = Parser.ParseExpression("0.3*x^3+4");
 e.DisplayExpression();
 Console.WriteLine("Expression");
