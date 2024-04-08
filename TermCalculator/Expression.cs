@@ -69,7 +69,7 @@ public class Expression
         for(int i = 0; i < this.Count; i++) {
             if(this[i].type != ExpressionPartType.Function) continue;
             if(functions.ContainsFunction(this[i].function, int.MaxValue)) continue;
-            unknown.Add(this[i].function);
+            if(!unknown.Contains(this[i].function)) unknown.Add(this[i].function);
         }
         return unknown;
     }

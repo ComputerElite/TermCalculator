@@ -37,6 +37,7 @@ public class Graphing {
             Console.WriteLine(xAsConsole + " - " + yAsConsole);
         }
 
+        DrawGraph(consoleXToConsoleY, displayWidth, displayHeight);
         return consoleXToConsoleY;
     }
 

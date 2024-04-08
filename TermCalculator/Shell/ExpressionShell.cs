@@ -13,6 +13,7 @@ public class ExpressionShell {
             {"set", new ExpressionShellCommand(Set, "Sets the content of the selected expression", "[content]")},
             {"eval", new ExpressionShellCommand(Eval, "Evaluates the current expression")},
             {"select", new ExpressionShellCommand(Select, "Selects another expression", "<num>")},
+            {"graph", new ExpressionShellCommand(Graph, "Graphs a graph in the given area", "<minx> <maxx> <miny> <maxy>")},
         };
     }
 
@@ -20,6 +21,40 @@ public class ExpressionShell {
     private int selectedExpression = 0;
 
     private Dictionary<string, ExpressionShellCommand> commands;
+
+    private void Graph(List<string> args) {
+        if(selectedExpression >= expressions.Count) {
+            Error("Selected expression does not exist, create it or select a different expression");
+            return;
+        }
+        if(args.Count < 4) {
+            Error("Not all arguments were given");
+            return;
+        }
+        int minX;
+        int maxX;
+        int minY;
+        int maxY;
+        if(!int.TryParse(args[0], out minX) || !int.TryParse(args[1], out maxX) || !int.TryParse(args[2], out minY) || !int.TryParse(args[3], out maxY)) {
+            Error("All arguments must be ints");
+            return;
+        }
+        double deltaX = maxX - minX;
+        double deltaY = maxY - minY;
+        double ratio = deltaX / deltaY;
+
+        int width;
+        int height;
+        if(ratio * Console.WindowHeight < Console.WindowWidth) {
+
+            width = (int)Math.Floor(ratio * Console.WindowHeight);
+            height = Console.WindowHeight;
+        } else {
+            height = (int)Math.Floor(ratio / Console.WindowWidth);
+            width = Console.WindowWidth;
+        }
+        Graphing.GraphFunction(expressions[selectedExpression], minX, maxX, minY, maxY, width, height);
+    }
 
     private void Select(List<string> args) {
         if(args.Count <= 0) {
